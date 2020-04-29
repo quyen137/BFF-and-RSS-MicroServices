@@ -1,6 +1,8 @@
 from flask import Flask
 from feedgen.feed import FeedGenerator
 import requests
+from datetime import datetime, timedelta
+from math import log
 
 
 app = Flask(__name__)
@@ -25,7 +27,7 @@ def posts_by_specific_community(Community):
         #     break
         fe = fg.add_entry()
         fe.title(each["PostTitle"])
-        fe.author({'name':each["Username"]} )
+        fe.author({'name':each["Username"], 'email':'@csu.fullerton.edu'} )
         fe.link( href=each["URLResource"], rel='alternate' )
         fe.description(each["Content"])
         # i+=1
@@ -51,7 +53,7 @@ def posts_by_community():
             break
         fe = fg.add_entry()
         fe.title(each["PostTitle"])
-        fe.author({'name':each["Username"]} )
+        fe.author({'name':each["Username"], 'email':'@csu.fullerton.edu'} )
         fe.link( href=each["URLResource"], rel='alternate' )
         fe.description(each["Content"])
         i+=1
@@ -82,7 +84,7 @@ def score_by_community(Community):
                 print ("id: ", data['id'], " PostID: ", data['postID'], " upVote: ",data['upVoted'], " Community: ", each['PostID'],"\n")
                 fe = fg.add_entry()
                 fe.title(each["PostTitle"])
-                fe.author({'name':each["Username"]} )
+                fe.author({'name':each["Username"], 'email':'@csu.fullerton.edu'} )
                 fe.link( href=each["URLResource"], rel='alternate' )
                 fe.content(each["Community"])
                 break
@@ -114,7 +116,7 @@ def posts_by_score_community():
                 # print ("Id: ", each["id"], " postID: ", each["postID"], " upVoted: " ,each["upVoted"], " downVoted: ",each["downVoted"],"communityID: ",each["communityID"],"\n")
                 fe = fg.add_entry()
                 fe.title(post["PostTitle"])
-                fe.author({'name':post["Username"]} )
+                fe.author({'name':each["Username"], 'email':'@csu.fullerton.edu'} )
                 fe.link( href=post["URLResource"], rel='alternate' )
                 fe.content(post["Community"])
                 # break
@@ -122,4 +124,37 @@ def posts_by_score_community():
     return rssfeed  
 
     
-# posts_by_score_community()
+# The hot 25 posts to any community, ranked using Reddit's "hot ranking" algorithm
+
+@app.route('/hot')
+def hot_post():
+    vote = "http://localhost:5100/api/v1/resources/votes/all"
+    queryVote = requests.get(vote)
+    jsonResponseVote = queryVote.json()
+    for each in jsonResponseVote:
+        seconds = epoch_seconds(each['postID'])
+        # print (seconds)
+        value = hotPost(each['upVoted'],each['downVoted'],epoch_seconds(each['postID']))
+        print (value)
+
+def epoch_seconds(postID):
+    post = "http://localhost:5000/posts/all"
+    queryPost = requests.get(post)
+    jsonResponsePost = queryPost.json()
+    for each in jsonResponsePost:
+        if (postID == each['PostID']):
+            epoch = datetime(1970,1,1)
+            format = "%Y-%m-%d %H:%M:%S"
+            date = datetime.strptime(each['PostDate'],format)   
+            value = date-epoch
+            return ((value.days * 86400 + value.seconds + (float(value.microseconds))) / 1000000)
+
+def hotPost(upVoted, downVoted, date):
+    score = int(upVoted) - int(downVoted)
+    order = log(max(abs(score), 1), 10)
+    sign = 1 if score > 0 else -1 if score < 0 else 0
+    seconds = date - 1134028003
+    return (round(sign * order + seconds / 45000))
+
+
+hot_post()

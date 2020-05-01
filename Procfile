@@ -1,0 +1,1 @@
+web3: gunicorn3 -b localhost:5200 --access-logfile - rss:app

@@ -7,9 +7,9 @@ from math import log
 app = Flask(__name__)
 
 # The 25 most recent posts to a particular community 
-@app.route('/<string:Community>')
-def posts_by_specific_community(Community):
-    URL = r"http://localhost:5000/posts/" + f'{Community}'
+@app.route('/<string:Community>/<int:n>')
+def posts_by_specific_community(Community,n):
+    URL = r"http://localhost:5000/posts/" + f'{Community}' + r"/" + f'{n}'
     result = requests.get(URL)
     jsonResponse = result.json()
     fg = FeedGenerator()
@@ -35,7 +35,8 @@ def posts_by_specific_community(Community):
 # The 25 most recent posts to any community 
 @app.route('/recent')
 def posts_by_community():
-    URL = "http://localhost:5000/posts"
+    URL = "http://localhost:5000/posts?n=25"
+    print(URL)
     result = requests.get(URL)
     jsonResponse = result.json()
     fg = FeedGenerator()

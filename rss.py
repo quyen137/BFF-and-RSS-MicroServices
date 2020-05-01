@@ -12,7 +12,6 @@ def posts_by_specific_community(Community):
     URL = r"http://localhost:5000/posts/" + f'{Community}'
     result = requests.get(URL)
     jsonResponse = result.json()
-    if 
     fg = FeedGenerator()
     fg.id('http://localhost:5200/<string:Community>')
     fg.title('The 25 most recent posts to a particular community ')
@@ -80,7 +79,7 @@ def score_by_community(Community):
     i = 0
     for data in sort_obj:
         for each in jsonResponse:
-            if (data['communityID'] == each['Community']):
+            if (data['postID'] == each['PostID']):
                 if (i == 25):
                     break
                 fe = fg.add_entry()

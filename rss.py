@@ -63,7 +63,8 @@ def posts_by_community():
 @app.route('/score/<string:Community>')
 def score_by_community(Community):
     print("community: ", Community)
-    URL = r"http://localhost:5000/posts/" + f'{Community}'
+    URL = r"http://localhost:5000/posts/" + f'{Community}' + r"/25"
+    print (URL)
     vote = "http://localhost:5100/api/v1/resources/votes/all"
     resultURL = requests.get(URL)
     resultVote = requests.get(vote)
@@ -81,8 +82,6 @@ def score_by_community(Community):
     for data in sort_obj:
         for each in jsonResponse:
             if (data['postID'] == each['PostID']):
-                if (i == 25):
-                    break
                 fe = fg.add_entry()
                 fe.id(str(each["PostID"]))
                 fe.title(each["PostTitle"])

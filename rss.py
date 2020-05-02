@@ -184,5 +184,3 @@ def hotPost(upVoted, downVoted, date):
     sign = 1 if score > 0 else -1 if score < 0 else 0
     seconds =  date - 1134028003.0
     return (round(sign * order + seconds / 45000, 7))
-
-hot_post()

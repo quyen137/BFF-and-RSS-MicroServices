@@ -1,4 +1,4 @@
-# cpsc449 Project 2 BFF and Rss
+# cpsc449 Project 2 BFF and RSS
 
 ## Steps to run: 
 ```sh
@@ -30,7 +30,7 @@ For this project, each microservices will be given a default port to ensure that
 	•BFF microservices: localhost:5200/recent
 
 ```
-# Rss feeds provided by the BFFF Microservices </br>
+# RSS feeds provided by the BFF Microservices </br>
 ### The 25 most recent posts to any community  </br>
 ```sh
 http://localhost:5200/recent
